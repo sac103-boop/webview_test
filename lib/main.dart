@@ -1,5 +1,8 @@
+// import 'dart:js';
+
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,28 +30,68 @@ class WebViewTest extends StatelessWidget {
         child: FlatButton(
           child: Text('Press me'),
           onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: Container(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    height: MediaQuery.of(context).size.height * 0.80,
-                    child: _openWebView(),
-                  ),
-                );
-              },
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) {
+                  return FadeTransition(
+                      opacity: animation1, child: ContainOpenWebview());
+                },
+              ),
             );
           },
         ),
       ),
     );
   }
+}
 
-  Widget _openWebView() {
-    return WebView(
-      initialUrl: "https://accion-popular.herokuapp.com/welcome",
-      javascriptMode: JavascriptMode.unrestricted,
+class ContainOpenWebview extends StatefulWidget {
+  @override
+  _ContainOpenWebviewState createState() => _ContainOpenWebviewState();
+}
+
+class _ContainOpenWebviewState extends State<ContainOpenWebview> {
+  FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
+
+  double lineProgress = 0.0;
+
+  void initState() {
+    super.initState();
+    flutterWebviewPlugin.onProgressChanged.listen((progress) {
+      // print(progress);
+      setState(() {
+        lineProgress = progress;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WebviewScaffold(
+      appBar: AppBar(
+        toolbarHeight: 6,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        bottom: PreferredSize(
+          child: _progressBar(lineProgress, context),
+          preferredSize: Size.fromHeight(3.0),
+        ),
+      ),
+      url: 'https://accion-popular.herokuapp.com/welcome',
     );
+  }
+
+  _progressBar(double progress, BuildContext context) {
+    return LinearProgressIndicator(
+      backgroundColor: Colors.white70.withOpacity(0),
+      value: progress == 1.0 ? 0 : progress,
+      valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
+    );
+  }
+
+  @override
+  void dispose() {
+    flutterWebviewPlugin.dispose();
+    super.dispose();
   }
 }
