@@ -95,8 +95,12 @@ class _ContainOpenWebviewState extends State<ContainOpenWebview> {
     super.dispose();
   }
 }
+<<<<<<< HEAD
 
 //hola mundo
+=======
+//Hola mundo x2
+>>>>>>> b21321d482fd97dc63ce54006187a42944ec6b7e
 
 //Test de pull
 // Te quiero Baby UwU 
